@@ -1,195 +1,192 @@
-import { ScrollView, StyleSheet, View, Text, TouchableOpacity, Image } from "react-native";
-import { Link } from "expo-router";
-import Navbar from "./../../components/navbar";
+// app/(tabs)/home.jsx
+import { useRouter } from "expo-router";
+import { collection, onSnapshot } from "firebase/firestore";
+import { useEffect, useRef, useState } from "react";
+import {
+  Dimensions,
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import * as Animatable from "react-native-animatable";
+import { db } from "../../firebase";
 
-export default function DashboardScreen() {
+const { width } = Dimensions.get("window");
+
+export default function HomeScreen() {
+  const router = useRouter();
+  const scrollRef = useRef(null);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [cars, setCars] = useState([]);
+
+  const banners = [
+    require("../../assets/images/5.png"),
+    require("../../assets/images/6.png"),
+    require("../../assets/images/7.png"),
+    require("../../assets/images/8.png"),
+  ];
+
+  // 🔹 Realtime ambil data mobil dari Firestore
+  useEffect(() => {
+    const unsub = onSnapshot(collection(db, "cars"), (snapshot) => {
+      const carList = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setCars(carList);
+    });
+    return () => unsub();
+  }, []);
+
+  // 🔹 Auto slide banner
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const nextIndex = (currentIndex + 1) % banners.length;
+      scrollRef.current?.scrollTo({ x: nextIndex * width, animated: true });
+      setCurrentIndex(nextIndex);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, [currentIndex]);
+
   return (
-    <>
-      <Navbar />
-
-      {/* Animasi container utama */}
-      <Animatable.View
-        animation="fadeInUp"
-        duration={1000}
-        easing="ease-out"
-        style={{ flex: 1 }}
-      >
-        <ScrollView contentContainerStyle={styles.container}>
-          <Animatable.Text animation="fadeInDown" duration={1000} style={styles.title}>
-            Selamat Datang di RentRider!
-          </Animatable.Text>
-
-          <Animatable.Text animation="fadeIn" delay={300} duration={1000} style={styles.subtitle}>
-            Aplikasi penyewaan motor terpercaya untuk perjalanan Anda yang tak terlupakan.
-          </Animatable.Text>
-
-          {/* Tombol Sewa Sekarang */}
-          <Animatable.View animation="zoomIn" delay={500} duration={900}>
-            <Link href="/explore" asChild>
-              <TouchableOpacity style={styles.button}>
-                <Text style={styles.buttonText}>Sewa Sekarang</Text>
-              </TouchableOpacity>
-            </Link>
-          </Animatable.View>
-
-          {/* Properti */}
-          <Animatable.View animation="fadeInUp" delay={600} style={styles.propertiContainer}>
-            <Text style={styles.testimoniTitle}>Fasilitas Yang Kami Sediakan</Text>
-
-            {[
-              { img: require("./../../assets/images/4.png"), label: "Helmet Standar SNI" },
-              { img: require("./../../assets/images/5.png"), label: "Mantel Hujan" },
-              { img: require("./../../assets/images/6.png"), label: "Phone Holder" },
-            ].map((item, index) => (
-              <Animatable.View
-                key={index}
-                animation="fadeInUp"
-                delay={700 + index * 200}
-                style={styles.card}
-              >
-                <View style={styles.testimoniWrapper}>
-                  <Image source={item.img} style={styles.testimoniIcon} />
-                </View>
-                <Text style={styles.namaItem}>{item.label}</Text>
-              </Animatable.View>
+    <Animatable.View animation="fadeInUp" duration={800} style={styles.container}>
+      <ScrollView showsVerticalScrollIndicator={false}>
+        {/* 🔹 Banner Slider */}
+        <View style={styles.bannerContainer}>
+          <ScrollView
+            horizontal
+            pagingEnabled
+            showsHorizontalScrollIndicator={false}
+            ref={scrollRef}
+            onMomentumScrollEnd={(e) => {
+              const index = Math.round(e.nativeEvent.contentOffset.x / width);
+              setCurrentIndex(index);
+            }}
+          >
+            {banners.map((img, index) => (
+              <Image key={index} source={img} style={styles.bannerImage} />
             ))}
-          </Animatable.View>
+          </ScrollView>
 
-          {/* Testimoni Pelanggan */}
-          <Animatable.View animation="fadeInUp" delay={1000} style={styles.testimoniContainer}>
-            <Text style={styles.testimoniTitle}>Apa Kata Pelanggan Kami?</Text>
+          <View style={styles.dotContainer}>
+            {banners.map((_, index) => (
+              <View
+                key={index}
+                style={[styles.dot, { opacity: index === currentIndex ? 1 : 0.3 }]}
+              />
+            ))}
+          </View>
+        </View>
 
-            <Animatable.View animation="fadeInUp" delay={1100} style={styles.card}>
-              <View style={styles.testimoniWrapper}>
-                <Image source={require("./../../assets/images/7.png")} style={styles.testimoniPic} />
-                <Text style={styles.testimoniText}>
-                  “Pelayanannya cepat dan motor dalam kondisi sangat baik. Saya puas banget!”
+        {/* 🔹 Daftar Mobil dari Firestore */}
+        <View style={styles.sectionContainer}>
+          <Text style={styles.header}>Selamat Datang di CarRental</Text>
+          <Text style={styles.title}>Pilih Mobil Anda dan Nikmati Perjalanannya!</Text>
+
+          {cars.map((car, index) => (
+            <Animatable.View
+              key={car.id}
+              animation="fadeInUp"
+              delay={200 * index}
+              style={styles.carCard}
+            >
+              <Image
+                source={{ uri: car.image }}
+                style={styles.carImage}
+                resizeMode="contain"
+              />
+              <View style={styles.carInfo}>
+                <Text style={styles.carName}>{car.name}</Text>
+                <Text style={styles.carType}>{car.brand || "Tanpa Merek"}</Text>
+                <Text style={styles.carPrice}>
+                  Rp {Number(car.price).toLocaleString("id-ID")} / hari
                 </Text>
-              </View>
-              <Text style={styles.namaPelanggan}>– Andi, Denpasar</Text>
-            </Animatable.View>
 
-            <Animatable.View animation="fadeInUp" delay={1300} style={styles.card}>
-              <View style={styles.testimoniWrapper}>
-                <Image source={require("./../../assets/images/8.png")} style={styles.testimoniPic} />
-                <Text style={styles.testimoniText}>
-                  “Harga terjangkau dan prosesnya mudah banget. Recommended buat wisatawan!”
-                </Text>
+                <TouchableOpacity
+                  style={styles.detailButton}
+                  onPress={() =>
+                    router.push({
+                      pathname: "/(tabs)/detail",
+                      params: {
+                        name: car.name,
+                        brand: car.brand,
+                        price: car.price,
+                        image: car.image,
+                        desc: car.desc,
+                        seats: car.seats,
+                        transmission: car.transmission,
+                      },
+                    })
+                  }
+                >
+                  <Text style={styles.detailButtonText}>Detail Mobil</Text>
+                </TouchableOpacity>
               </View>
-              <Text style={styles.namaPelanggan}>– Rina, Jakarta</Text>
             </Animatable.View>
-          </Animatable.View>
+          ))}
+        </View>
 
-          <Animatable.Text animation="fadeIn" delay={1600} style={styles.footer}>
-            Dibuat Oleh RentRider dengan ❤️
-          </Animatable.Text>
-        </ScrollView>
-      </Animatable.View>
-    </>
+        <Text style={styles.footer}>© 2025 RentRider — Teman Perjalanan Anda</Text>
+      </ScrollView>
+    </Animatable.View>
   );
 }
 
+// 🎨 Style diambil dari versi pertama (lebih rapi)
 const styles = StyleSheet.create({
-  container: {
-    flexGrow: 1,
-    backgroundColor: "#f9f9f9",
-    alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: 50,
-    paddingHorizontal: 20,
-  },
-  title: {
-    fontSize: 35,
-    fontWeight: "bold",
-    color: "#1E3A8A",
-    marginBottom: 10,
-    textAlign: "center",
-  },
-  subtitle: {
-    fontSize: 16,
-    color: "#4B5563",
-    textAlign: "center",
-    marginBottom: 25,
-  },
-  button: {
-    paddingVertical: 14,
-    paddingHorizontal: 24,
-    borderRadius: 10,
-    borderColor: "#1E3A8A",
-    borderWidth: 2,
-    marginBottom: 40,
-  },
-  buttonText: {
-    color: "#1E3A8A",
-    fontWeight: "bold",
-    fontSize: 16,
-  },
-  testimoniContainer: {
+  container: { flex: 1, backgroundColor: "#F9FAFB" },
+
+  // Banner
+  bannerContainer: { position: "relative", height: 200, backgroundColor: "#E5E7EB" },
+  bannerImage: { width: width, height: 230, resizeMode: "cover" },
+  dotContainer: {
+    position: "absolute",
+    bottom: 10,
     width: "100%",
+    flexDirection: "row",
+    justifyContent: "center",
   },
-  propertiContainer: {
-    width: "50%",
-    marginBottom: 40,
+  dot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: "#1E3A8A",
+    marginHorizontal: 4,
   },
-  testimoniTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#111827",
-    marginBottom: 20,
-    textAlign: "center",
-  },
-  card: {
+
+  // Mobil
+  sectionContainer: { paddingHorizontal: 15, marginTop: 20 },
+  sectionTitle: { fontSize: 18, fontWeight: "bold", color: "#16171aff", marginBottom: 10 },
+  carCard: {
+    flexDirection: "row",
     backgroundColor: "white",
-    padding: 20,
-    borderRadius: 12,
-    shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
+    borderRadius: 10,
+    padding: 10,
     elevation: 3,
     marginBottom: 15,
   },
-  testimoniWrapper: {
-    flexDirection: "row",
+  carImage: { width: 100, height: 80, resizeMode: "contain", marginRight: 12 },
+  carInfo: { flex: 1, justifyContent: "center" },
+  carName: { fontWeight: "bold", fontSize: 16, color: "#111827" },
+  carType: { fontSize: 13, color: "#6B7280", marginBottom: 4 },
+  carPrice: { fontWeight: "600", color: "#1E3A8A", marginBottom: 10 },
+  detailButton: {
+    backgroundColor: "#1E3A8A",
+    paddingVertical: 6,
+    borderRadius: 8,
     alignItems: "center",
-    justifyContent: "center",
-    gap: 8,
   },
-  testimoniIcon: {
-    width: 120,
-    height: 120,
-    resizeMode: "contain",
-    marginTop: 2,
-  },
-  testimoniPic: {
-    width: 30,
-    height: 30,
-    resizeMode: "contain",
-    marginTop: 2,
-  },
-  testimoniText: {
-    flex: 1,
-    fontSize: 14,
-    color: "#374151",
-    marginBottom: 10,
-    fontStyle: "italic",
-  },
-  namaItem: {
-    fontSize: 13,
-    fontWeight: "600",
-    color: "#1E3A8A",
-    textAlign: "center",
-  },
-  namaPelanggan: {
-    fontSize: 13,
-    fontWeight: "600",
-    color: "#1E3A8A",
-    textAlign: "right",
-  },
+  detailButtonText: { color: "white", fontWeight: "bold", fontSize: 13 },
   footer: {
-    fontSize: 12,
-    color: "#9CA3AF",
     textAlign: "center",
-    marginTop: 20,
+    color: "#9CA3AF",
+    fontSize: 12,
+    marginTop: 15,
+    marginBottom: 20,
   },
+  header: { fontSize: 35, fontWeight: "bold", marginBottom: 7, color: "#1E3A8A" },
+  title: { fontSize: 20, fontWeight: "bold", color: "#1E3A8A", marginBottom: 10 },
 });

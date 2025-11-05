@@ -1,74 +1,73 @@
-import { useEffect, useState } from "react";
-import {
-  View,
-  Text,
-  Image,
-  TouchableOpacity,
-  StyleSheet,
-  TextInput,
-  Alert,
-  ScrollView,
-  Modal,
-  Platform,
-} from "react-native";
 import * as FileSystem from "expo-file-system/legacy";
 import * as Sharing from "expo-sharing";
-import Navbar from "./../../components/navbar";
-import { useBikesStore } from "../../store/useBikeStore";
-import * as Animatable from "react-native-animatable"; 
+import { useEffect, useState } from "react";
+import {
+  Alert,
+  Image,
+  Modal,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import * as Animatable from "react-native-animatable";
+import { useCarsStore } from "../../store/useCarsStore";
 
-const initialBikes = [
+const initialCars = [
   {
     id: "1",
-    name: "Yamaha NMAX",
-    brand: "Yamaha",
-    category: "Matic",
+    name: "Toyota Avanza",
+    brand: "Toyota",
+    category: "MPV",
     fuel: "Bensin",
-    cc: 155,
+    cc: 1500,
     unit: 3,
-    price: 80000,
-    image: require("@/assets/images/nmax.jpeg"),
+    price: 350000,
+    image: require("./../../assets/images/avanza.png"),
   },
   {
     id: "2",
-    name: "Honda Vario 125",
+    name: "Honda Brio",
     brand: "Honda",
-    category: "Matic",
+    category: "Hatchback",
     fuel: "Bensin",
-    cc: 125,
+    cc: 1200,
     unit: 1,
-    price: 70000,
-    image: require("@/assets/images/vario.jpeg"),
+    price: 300000,
+    image: require("./../../assets/images/avanza.png"),
   },
   {
     id: "3",
-    name: "Kawasaki Ninja 250",
-    brand: "Kawasaki",
-    category: "Sport",
+    name: "Mitsubishi Xpander",
+    brand: "Mitsubishi",
+    category: "MPV",
     fuel: "Bensin",
-    cc: 250,
+    cc: 1500,
     unit: 0,
-    price: 200000,
-    image: require("@/assets/images/ninja.jpeg"),
+    price: 400000,
+    image: require("./../../assets/images/avanza.png"),
   },
   {
     id: "4",
-    name: "Honda CBR 150R",
-    brand: "Honda",
-    category: "Sport",
+    name: "Daihatsu Terios",
+    brand: "Daihatsu",
+    category: "SUV",
     fuel: "Bensin",
-    cc: 150,
+    cc: 1500,
     unit: 2,
-    price: 150000,
-    image: require("@/assets/images/cbr.jpeg"),
+    price: 450000,
+    image: require("./../../assets/images/avanza.png"),
   },
 ];
 
-export default function ListMotorScreen() {
-  const { bikes, setBikes, updateBikeUnit } = useBikesStore();
+export default function ListCarScreen() {
+  const { cars, setCars, updateCarUnit } = useCarsStore();
   const [search, setSearch] = useState("");
   const [expandedCategories, setExpandedCategories] = useState<string[]>([]);
-  const [selectedBike, setSelectedBike] = useState<any>(null);
+  const [selectedCar, setSelectedCar] = useState<any>(null);
   const [formVisible, setFormVisible] = useState(false);
   const [nama, setNama] = useState("");
   const [lamaSewa, setLamaSewa] = useState("");
@@ -76,8 +75,8 @@ export default function ListMotorScreen() {
   const [fileUri, setFileUri] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!bikes || bikes.length === 0) {
-      setBikes(initialBikes);
+    if (!cars || cars.length === 0) {
+      setCars(initialCars);
     }
   }, []);
 
@@ -89,12 +88,12 @@ export default function ListMotorScreen() {
     }
   };
 
-  const handleRent = (bike: any) => {
-    if (bike.unit === 0) {
-      Alert.alert("Unit Habis", `${bike.name} tidak tersedia untuk disewa.`);
+  const handleRent = (car: any) => {
+    if (car.unit === 0) {
+      Alert.alert("Unit Habis", `${car.name} tidak tersedia untuk disewa.`);
       return;
     }
-    setSelectedBike(bike);
+    setSelectedCar(car);
     setFormVisible(true);
   };
 
@@ -105,25 +104,25 @@ export default function ListMotorScreen() {
     }
 
     const days = parseInt(lamaSewa);
-    const totalHarga = selectedBike.price * days;
+    const totalHarga = selectedCar.price * days;
 
-    updateBikeUnit(selectedBike.id, selectedBike.unit - 1);
+    updateCarUnit(selectedCar.id, selectedCar.unit - 1);
 
     const content = `
-📄 Bukti Booking Motor RentRide
+📄 Bukti Booking Mobil RentCar
 
 Nama Penyewa : ${nama}
-Motor        : ${selectedBike.name}
-Merk         : ${selectedBike.brand}
-Kategori     : ${selectedBike.category}
+Mobil        : ${selectedCar.name}
+Merk         : ${selectedCar.brand}
+Kategori     : ${selectedCar.category}
 Lama Sewa    : ${days} hari
-Harga / Hari : Rp ${selectedBike.price.toLocaleString()}
+Harga / Hari : Rp ${selectedCar.price.toLocaleString()}
 Total Bayar  : Rp ${totalHarga.toLocaleString()}
 
-⚠️ Pembayaran hanya bisa dilakukan secara CASH di RentRide.
+⚠️ Pembayaran hanya bisa dilakukan secara CASH di RentCar.
 Tunjukkan bukti ini kepada admin saat pembayaran dan pengambilan unit.
 
-Terima kasih telah menggunakan layanan RentRide 🛵
+Terima kasih telah menggunakan layanan RentCar 🚗
 `;
 
     try {
@@ -132,7 +131,7 @@ Terima kasih telah menggunakan layanan RentRide 🛵
         const url = window.URL.createObjectURL(blob);
         setFileUri(url);
       } else {
-        const file = `${FileSystem.documentDirectory}BuktiBooking_${selectedBike.name}_${nama}.txt`;
+        const file = `${FileSystem.documentDirectory}BuktiBooking_${selectedCar.name}_${nama}.txt`;
         await FileSystem.writeAsStringAsync(file, content);
         setFileUri(file);
       }
@@ -151,7 +150,7 @@ Terima kasih telah menggunakan layanan RentRide 🛵
       if (Platform.OS === "web") {
         const a = document.createElement("a");
         a.href = fileUri;
-        a.download = "BuktiBooking_RentRide.txt";
+        a.download = "BuktiBooking_RentCar.txt";
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -162,23 +161,23 @@ Terima kasih telah menggunakan layanan RentRide 🛵
       setSuccessModal(false);
       setNama("");
       setLamaSewa("");
-      setSelectedBike(null);
+      setSelectedCar(null);
     } catch {
       Alert.alert("Error", "Gagal mendownload bukti booking.");
     }
   };
 
-  const filteredBikes = (bikes || []).filter((b) =>
-    b.name.toLowerCase().includes(search.toLowerCase())
+  const filteredCars = (cars || []).filter((c) =>
+    c.name.toLowerCase().includes(search.toLowerCase())
   );
 
-  const groupedByCategory = filteredBikes.reduce((groups: any, b) => {
-    if (!groups[b.category]) groups[b.category] = [];
-    groups[b.category].push(b);
+  const groupedByCategory = filteredCars.reduce((groups: any, c) => {
+    if (!groups[c.category]) groups[c.category] = [];
+    groups[c.category].push(c);
     return groups;
   }, {});
 
-  const renderBikeImage = (imageSource: any) => {
+  const renderCarImage = (imageSource: any) => {
     if (typeof imageSource === "string") {
       return <Image source={{ uri: imageSource }} style={styles.image} resizeMode="contain" />;
     } else {
@@ -186,32 +185,31 @@ Terima kasih telah menggunakan layanan RentRide 🛵
     }
   };
 
-  // Hanya tambahkan Animatable.View dengan pointerEvents="box-none" -> anak tetap menerima touch
-  const renderBike = (bike: any) => (
+  const renderCar = (car: any) => (
     <Animatable.View
-      key={bike.id}
+      key={car.id}
       animation="fadeInUp"
       duration={600}
       style={styles.card}
-      pointerEvents="box-none" // <- penting: jangan menyerap touch
+      pointerEvents="box-none"
     >
-      {bike.image && renderBikeImage(bike.image)}
-      <Text style={styles.title}>{bike.name}</Text>
-      <Text style={styles.text}>Merk: {bike.brand}</Text>
-      <Text style={styles.text}>Kategori: {bike.category}</Text>
+      {car.image && renderCarImage(car.image)}
+      <Text style={styles.title}>{car.name}</Text>
+      <Text style={styles.text}>Merk: {car.brand}</Text>
+      <Text style={styles.text}>Kategori: {car.category}</Text>
       <Text style={styles.text}>
-        Harga: Rp {bike.price.toLocaleString()} /hari
+        Harga: Rp {car.price.toLocaleString()} /hari
       </Text>
-      <Text style={styles.text}>Unit Tersedia: {bike.unit}</Text>
+      <Text style={styles.text}>Unit Tersedia: {car.unit}</Text>
 
       <TouchableOpacity
-        style={[styles.button, bike.unit === 0 && styles.disabledButton]}
-        disabled={bike.unit === 0}
-        onPress={() => handleRent(bike)}
+        style={[styles.button, car.unit === 0 && styles.disabledButton]}
+        disabled={car.unit === 0}
+        onPress={() => handleRent(car)}
         activeOpacity={0.8}
       >
         <Text style={styles.buttonText}>
-          {bike.unit === 0 ? "Tidak Tersedia" : "Sewa Motor"}
+          {car.unit === 0 ? "Tidak Tersedia" : "Sewa Mobil"}
         </Text>
       </TouchableOpacity>
     </Animatable.View>
@@ -219,21 +217,19 @@ Terima kasih telah menggunakan layanan RentRide 🛵
 
   return (
     <>
-      <Navbar />
-      {/* wrapper halaman tetap, tapi pointerEvents default oke di sini */}
       <Animatable.View animation="fadeIn" duration={700} style={styles.container}>
-        <Text style={styles.pageTitle}>Daftar Motor Tersedia</Text>
+        <Text style={styles.pageTitle}>Daftar Mobil Tersedia</Text>
 
         <TextInput
           style={styles.searchInput}
-          placeholder="Cari nama motor..."
+          placeholder="Cari nama mobil..."
           value={search}
           onChangeText={setSearch}
         />
 
         <ScrollView contentContainerStyle={{ paddingBottom: 100 }}>
           {Object.keys(groupedByCategory).length === 0 ? (
-            <Text style={styles.emptyText}>Tidak ada motor tersedia</Text>
+            <Text style={styles.emptyText}>Tidak ada mobil tersedia</Text>
           ) : (
             Object.keys(groupedByCategory).map((category) => {
               const isExpanded = expandedCategories.includes(category);
@@ -248,10 +244,9 @@ Terima kasih telah menggunakan layanan RentRide 🛵
                   </TouchableOpacity>
 
                   {isExpanded && (
-                    // wrapper kategori juga jangan menyerap touch (anak-anak tetap clickable)
                     <Animatable.View animation="fadeIn" duration={500} pointerEvents="box-none">
-                      {groupedByCategory[category].map((bike: any) =>
-                        renderBike(bike)
+                      {groupedByCategory[category].map((car: any) =>
+                        renderCar(car)
                       )}
                     </Animatable.View>
                   )}
@@ -267,7 +262,7 @@ Terima kasih telah menggunakan layanan RentRide 🛵
         <View style={styles.modalOverlay}>
           <View style={styles.modalContainer}>
             <Text style={styles.modalTitle}>
-              Form Sewa {selectedBike?.name}
+              Form Sewa {selectedCar?.name}
             </Text>
             <TextInput
               placeholder="Nama Penyewa"
@@ -285,11 +280,11 @@ Terima kasih telah menggunakan layanan RentRide 🛵
             {lamaSewa ? (
               <Text style={styles.totalText}>
                 Total: Rp{" "}
-                {(selectedBike?.price * parseInt(lamaSewa)).toLocaleString()}
+                {(selectedCar?.price * parseInt(lamaSewa)).toLocaleString()}
               </Text>
             ) : null}
             <Text style={styles.noteText}>
-              ⚠️ Pembayaran hanya bisa dilakukan secara cash di RentRide.
+              ⚠️ Pembayaran hanya bisa dilakukan secara cash di RentCar.
             </Text>
 
             <TouchableOpacity
@@ -314,7 +309,7 @@ Terima kasih telah menggunakan layanan RentRide 🛵
           <View style={styles.successBox}>
             <Text style={styles.modalTitle}>✅ Sewa Berhasil!</Text>
             <Text style={{ textAlign: "center", marginBottom: 15 }}>
-              Download bukti booking Anda dan tunjukkan ke admin RentRide saat
+              Download bukti booking Anda dan tunjukkan ke admin RentCar saat
               pembayaran dan pengambilan unit.
             </Text>
             <TouchableOpacity
@@ -327,7 +322,7 @@ Terima kasih telah menggunakan layanan RentRide 🛵
         </View>
       </Modal>
       <View>
-        <Text style={styles.footer}>Dibuat Oleh RentRider dengan ❤️</Text>
+        <Text style={styles.footer}>Dibuat Oleh RentCar dengan ❤️</Text>
       </View>
     </>
   );

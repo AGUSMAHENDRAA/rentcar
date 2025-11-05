@@ -1,16 +1,16 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
-  View,
+  Alert,
+  ScrollView,
+  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
-  StyleSheet,
-  ScrollView,
-  Alert,
+  View,
 } from "react-native";
-import Navbar from "./../../components/navbar";
-import { useBikesStore } from "../../store/useBikeStore";
 import * as Animatable from "react-native-animatable"; // <= tambah ini
+import { useBikesStore } from "../../store/useCarsStore";
+import Navbar from "./../../components/navbar";
 
 export default function ReturnMotorScreen() {
   const { bikes, updateBikeUnit } = useBikesStore();

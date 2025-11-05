@@ -1,35 +1,77 @@
-// import { Tabs } from 'expo-router';
-// import React from 'react';
+import { Ionicons } from "@expo/vector-icons";
+import { Tabs } from "expo-router";
 
-// import { HapticTab } from '@/components/haptic-tab';
-// import { IconSymbol } from '@/components/ui/icon-symbol';
-// import { Colors } from '@/constants/theme';
-// import { useColorScheme } from '@/hooks/use-color-scheme';
+export default function TabsLayout() {
+  return (
+    <Tabs
+      screenOptions={{
+        headerShown: false,
+        tabBarActiveTintColor: "#1C3B8A",
+        tabBarInactiveTintColor: "#9CA3AF",
+        tabBarStyle: {
+          backgroundColor: "#fff",
+          height: 65,
+          paddingBottom: 5,
+          paddingTop: 5,
+        },
+      }}
+    >
+      {/* Home */}
+      <Tabs.Screen
+        name="index"
+        options={{
+          title: "Home",
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="home-outline" size={size} color={color} />
+          ),
+        }}
+      />
 
-// export default function TabLayout() {
-//   const colorScheme = useColorScheme();
+      Explore
+      <Tabs.Screen
+        name="explore"
+        options={{
+          href: null,
+        }}
+      />
 
-//   return (
-//     <Tabs
-//       screenOptions={{
-//         tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-//         headerShown: false,
-//         tabBarButton: HapticTab,
-//       }}>
-//       <Tabs.Screen
-//         name="index"
-//         options={{
-//           title: 'Home',
-//           tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
-//         }}
-//       />
-//       <Tabs.Screen
-//         name="explore"
-//         options={{
-//           title: 'Explore',
-//           tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
-//         }}
-//       />
-//     </Tabs>
-//   );
-// }
+      {/* Profile */}
+      <Tabs.Screen
+        name="profile"
+        options={{
+          title: "Profile",
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="person-outline" size={size} color={color} />
+          ),
+        }}
+      />
+
+      {/* 🔹 Sembunyikan tab lain (tidak muncul di bawah) */}
+      <Tabs.Screen
+        name="AdminCRUDScreen"
+        options={{
+          title: "Admin",
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="person-outline" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="detail"
+        options={{ href: null }}
+      />
+      <Tabs.Screen
+        name="formPemesanan"
+        options={{ href: null }}
+      />
+      <Tabs.Screen
+        name="ReturnMotorScreen"
+        options={{ href: null }}
+      />
+      <Tabs.Screen
+        name="riwayatUser"
+        options={{ href: null }}
+      />
+    </Tabs>
+  );
+}
