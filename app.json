@@ -1,7 +1,8 @@
 {
   "expo": {
     "name": "RentBike",
-    "slug": "RentBike",
+    "slug": "rentbike",
+    "owner": "tianarsamm",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -9,9 +10,14 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.tian.rentbike",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
+      "package": "com.tian.rentbike",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
@@ -40,8 +46,11 @@
             "imageWidth": 220
           }
         }
-      ]
-    ],
+      ],
+      "expo-web-browser",
+      "@react-native-google-signin/google-signin"
+    ]
+    ,
     "splash": {
       "image": "/assets/images/logocar.png",
       "resizeMode": "contain",
@@ -50,6 +59,15 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "clientId": "413207578021-onkaj7rt3pjnodqn876r4u13jtlaicg3.apps.googleusercontent.com",
+      "androidClientId": "413207578021-u9k9da07v15hqq17n2l92e4b1kj5ts4q.apps.googleusercontent.com",
+      "iosClientId": "413207578021-op2bppfotk973k8o2podg6hpfvav9pdj.apps.googleusercontent.com",
+      "router": {},
+      "eas": {
+        "projectId": "644b227a-6d79-43b5-b163-c6017ecbb32f"
+      }
     }
   }
 }
